@@ -2,10 +2,12 @@
 
 ---
 # THE SUPER HYPER POKE DIGI MEGA MUCHI-FANTASTIC FINAL PROJECT (2D-BASIC-PLANNER)
-NAME: **WRITE YOUR NAME HERE**
-
+NAME: Juan Camilo Torres Mestra
 ---
-**INSTRUCTIONS**:
+## SOLUTION TO QUESTIONARY AND REPORT
+https://drive.google.com/drive/folders/1qigeC1ViWLvBXHuX1ZNrfbyfYZYQwJN0?usp=sharing
+---
+## INSTRUCTIONS:
 1. Fork this repository, and associate it with your GitHub account.
 2. Create a new branch name as `develop` and work all your solutions there.
 3. Every time that you complete a basic point create a commit, add the files and push with the next format description: `[FEAT]: description of what you did`.
