@@ -32,6 +32,7 @@ from utils.python_utils import print_list_text
 from usr_msgs.msg import Planner as planner_msg
 from usr_msgs.msg import Kiwibot as kiwibot_msg
 
+from usr_srvs.srv import Stop
 # =============================================================================
 def setProcessName(name: str) -> None:
     """!
@@ -99,6 +100,7 @@ class VisualsNode(Thread, Node):
             callback=self.cb_kiwibot_status,
         )
 
+
         self.turn_robot(heading_angle=float(os.getenv("BOT_INITIAL_YAW", default=0.0)))
         self.msg_kiwibot.pos_x = int(os.getenv("BOT_INITIAL_X", default=917))
         self.msg_kiwibot.pos_y = int(os.getenv("BOT_INITIAL_Y", default=1047))
@@ -117,6 +119,7 @@ class VisualsNode(Thread, Node):
         )
 
         # ---------------------------------------------------------------------
+        self.inital_distance = 0
         self.damon = True
         self.run_event = Event()
         self.run_event.set()
@@ -393,8 +396,11 @@ class VisualsNode(Thread, Node):
             thickness=1,
             fontScale=0.4,
         )
-
-        porc = "???"
+        
+        track_dist = (self.msg_planner.distance-self.inital_distance)
+        interval_dist = (self.msg_kiwibot.dist-self.inital_distance)
+        porc = round((interval_dist/track_dist)*100,2) if track_dist > 0 else 0.0
+        #porc = self.msg_percentage
         win_img = print_list_text(
             win_img,
             [f"Porc: {porc}%"],
@@ -434,8 +440,6 @@ class VisualsNode(Thread, Node):
         Args:
         Returns:
         """
-        # Initialize the Google Sheets writer
-        # Pass the planner message
 
         if self._win_background is None or self._kiwibot_img is None:
             return
@@ -474,10 +478,17 @@ class VisualsNode(Thread, Node):
                     # )
                     # continue
                     printlog(
-                        msg=f"Routine {chr(key)} was sent to path planner node",
+                        msg=f"Routine {chr(key)} was sent to path planner node.",
                         msg_type="INFO",
                     )
+                    self.inital_distance = self.msg_kiwibot.dist
                     self.pub_start_routine.publish(Int32(data=int(chr(key))))
+                # ESC key
+                elif key == 27:
+                    printlog(
+                        msg=f"ESC key pressed -> Stopping routine",
+                        msg_type="WARN",
+                    )
 
                 else:
                     printlog(
