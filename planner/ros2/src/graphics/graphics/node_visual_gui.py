@@ -28,6 +28,7 @@ from rclpy.node import Node
 from utils.python_utils import overlay_image, printlog
 from utils.python_utils import print_list_text
 
+
 from usr_msgs.msg import Planner as planner_msg
 from usr_msgs.msg import Kiwibot as kiwibot_msg
 
@@ -181,7 +182,7 @@ class VisualsNode(Thread, Node):
                     self.turn_robot(heading_angle=msg.yaw)
                 else:
                     move_angle = msg.yaw - self.msg_kiwibot.yaw
-                    self.turn_robot(heading_angle=move_angle)
+                    self.turn_robot(heading_angle=self.msg_kiwibot.yaw)
 
             self.msg_kiwibot = msg
 
@@ -304,7 +305,9 @@ class VisualsNode(Thread, Node):
 
         # Rotate robots image
         self._kiwibot_img = cv2.warpAffine(
-            src=self._kiwibot_img,
+            src=cv2.imread(
+                        self._kiwibot_img_path, cv2.IMREAD_UNCHANGED
+                    ),
             M=M,
             dsize=(cols, rows),
             flags=cv2.INTER_CUBIC,
@@ -431,6 +434,8 @@ class VisualsNode(Thread, Node):
         Args:
         Returns:
         """
+        # Initialize the Google Sheets writer
+        # Pass the planner message
 
         if self._win_background is None or self._kiwibot_img is None:
             return
@@ -473,6 +478,7 @@ class VisualsNode(Thread, Node):
                         msg_type="INFO",
                     )
                     self.pub_start_routine.publish(Int32(data=int(chr(key))))
+
                 else:
                     printlog(
                         msg=f"No action for key {chr(key)} -> {key}",
