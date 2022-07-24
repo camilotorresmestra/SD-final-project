@@ -167,7 +167,7 @@ class PlannerNode(Node):
                 msg="No services for robot actions, {}".format(e),
                 msg_type="ERROR",
             )
-        
+        # ----------------------------------------------------------------------
         # GSheetWriter
         self.gsw = GSheetWriter()
 

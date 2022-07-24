@@ -23,6 +23,7 @@ from rclpy.node import Node
 
 from usr_srvs.srv import Move
 from usr_srvs.srv import Turn
+from usr_srvs.srv import Stop
 
 from std_msgs.msg import Int8
 
@@ -117,6 +118,14 @@ class KiwibotNode(Node):
             callback_group=self.callback_group,
         )
 
+        # service to stop the robot
+        self.srv_robot_stop = self.create_service(
+            Stop,
+            "/robot/stop",
+            self.cb_srv_robot_stop,
+            callback_group=self.callback_group,
+        )
+
     def cb_srv_robot_turn(self, request, response) -> Turn:
         """
             Callback to update kiwibot state information when turning
@@ -132,7 +141,7 @@ class KiwibotNode(Node):
         try:
 
             for idx, turn_ref in enumerate(request.turn_ref[:-1]):
-
+                
                 if self._TURN_PRINT_WAYPOINT:
                     printlog(msg=turn_ref, msg_type="INFO")
 
@@ -217,6 +226,33 @@ class KiwibotNode(Node):
                 msg_type="ERROR",
             )
             response.completed = False
+
+        return response
+
+    def cb_srv_robot_stop(self, response) -> Stop:
+        """
+            Callback to update kiwibot state information when stop
+            request service
+        Args:
+            request: `usr_srvs.srv._stop.Stop_Request` request of stopping the robot
+        Returns:
+            response: `usr_srvs.srv._stop.Stop_Response` Stop requested
+        """
+        try:
+            # time.sleep(wp.dt)
+            self.status.speed = 0.0
+            self.status.moving = False
+            self.pub_bot_status.publish(self.status)
+            self.pub_speaker.publish(Int8(data=1))
+            response.stopped = True
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            printlog(
+                msg="{}, {}, {}, {}".format(e, exc_type, fname, exc_tb.tb_lineno),
+                msg_type="ERROR",
+            )
+            response.stopped = False
 
         return response
 

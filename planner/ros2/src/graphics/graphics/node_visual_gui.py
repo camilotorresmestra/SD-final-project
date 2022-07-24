@@ -33,6 +33,7 @@ from usr_msgs.msg import Planner as planner_msg
 from usr_msgs.msg import Kiwibot as kiwibot_msg
 
 from usr_srvs.srv import Stop
+
 # =============================================================================
 def setProcessName(name: str) -> None:
     """!
@@ -118,12 +119,35 @@ class VisualsNode(Thread, Node):
             callback_group=self.callback_group,
         )
 
+        self.msg_percentage = Int32()
+        self.pub_percentage = self.create_publisher(
+            msg_type=Int32,
+            topic="/graphics/percentage",
+            qos_profile=1,
+            callback_group=self.callback_group,
+        )
+        #----------------------------------------------------------------------
+        # Services
+        # service client to stop the robot
+        self.cli_robot_stop = self.create_client(Stop, "/robot/stop")
+
+        try:
+            self.robot_stop_req = Stop.Request()
+        except Exception as e:
+            printlog(
+                msg="No services for robot actions, {}".format(e),
+                msg_type="ERROR",
+            )
+        
+        
+
         # ---------------------------------------------------------------------
         self.inital_distance = 0
         self.damon = True
         self.run_event = Event()
         self.run_event.set()
         self.start()
+
 
     def cb_path_planner(self, msg: planner_msg) -> None:
         """
@@ -478,11 +502,10 @@ class VisualsNode(Thread, Node):
                     # )
                     # continue
                     printlog(
-                        msg=f"Routine {chr(key)} was sent to path planner node.",
+                        msg=f"Routine {chr(key)} was sent to path planner node. Initial distance at beggining: {round(self.msg_kiwibot.dist,2)}",
                         msg_type="INFO",
                     )
                     self.inital_distance = self.msg_kiwibot.dist
-                    self.pub_start_routine.publish(Int32(data=int(chr(key))))
                 # ESC key
                 elif key == 27:
                     printlog(
