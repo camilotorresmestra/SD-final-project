@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # =============================================================================
+from email import message
 import os
 import cv2
 import inspect
@@ -159,3 +160,24 @@ def print_list_text(
         )
 
     return img_src
+from usr_msgs.msg import Kiwibot as kiwibot_msg
+import gspread
+from datetime import datetime
+
+class GSheetWriter():
+    def __init__(self, index=2):
+        # Change to load with g_auth
+        self._filename = '/workspace/planner/creds/caramel-logic-295802-ca4ef81bcc62.json'
+        self.gc = gspread.service_account(filename=self._filename)
+        self.wks = self.gc.open("SD_final_project").sheet1
+        self.index = index
+    # id (different than routine_id), date, time, routine_id, total_distance, total_time
+    def write_row(self,routine_id, total_distance, total_time):
+        now = datetime.now()
+        self.wks.update_cell(self.index,1,self.index)
+        self.wks.update_cell(self.index,2,str(now.date()))
+        self.wks.update_cell(self.index,3,str(now.time()))
+        self.wks.update_cell(self.index,4,routine_id)
+        self.wks.update_cell(self.index,5,total_distance)
+        self.wks.update_cell(self.index,6,total_time)
+        self.index += 1

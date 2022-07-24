@@ -26,6 +26,7 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Int8
 
 from utils.python_utils import printlog
+from utils.python_utils import GSheetWriter
 
 from usr_msgs.msg import Planner as planner_msg
 from usr_msgs.msg import LandMark
@@ -124,7 +125,7 @@ class PlannerNode(Node):
         )
 
         self.kiwibot_state = Kiwibot()
-        self.sub_kiwibot_stat = self.create_subscription(
+        self.sub_kiwibot_state = self.create_subscription(
             msg_type=Kiwibot,
             topic="/kiwibot/status",
             callback=self.cb_kiwibot_status,
@@ -166,6 +167,9 @@ class PlannerNode(Node):
                 msg="No services for robot actions, {}".format(e),
                 msg_type="ERROR",
             )
+        # ----------------------------------------------------------------------
+        # GSheetWriter
+        self.gsw = GSheetWriter()
 
     def cb_kiwibot_status(self, msg: Kiwibot) -> None:
         """
@@ -238,6 +242,14 @@ class PlannerNode(Node):
                         difficulty=self.map_difficulty,
                     )
                 )
+
+                # Publish the routine statistics to GSheets:
+                
+                
+                try:
+                    self.gsw.write_row(routine_id=int(msg.data), total_distance=self.map_distance, total_time=self.map_duration)
+                except Exception as e:
+                    printlog(msg=e,msg_type='WARN')    
 
                 # -------------------------------------------------------
                 # Get the robot in the initial position
@@ -442,6 +454,8 @@ class PlannerNode(Node):
             np.mean(map_difficulty) if len(map_difficulty) else None, 2
         )
         self.map_distance = round(self.map_distance, 2)
+
+
 
         return way_points
 

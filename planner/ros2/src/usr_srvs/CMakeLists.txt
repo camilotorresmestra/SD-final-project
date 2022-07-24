@@ -38,6 +38,7 @@ set(SRV_FILES
   # Router
   "srv/robot/Move.srv"
   "srv/robot/Turn.srv"
+  "srv/robot/Stop.srv"
 )
 
 # Message generation

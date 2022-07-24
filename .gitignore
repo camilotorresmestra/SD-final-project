@@ -8,6 +8,7 @@ planner/scripts/
 *core
 log
 .vscode
+creds/
 # ---------------------------------------------------
 # Byte-compiled / optimized / DLL files
 __pycache__/

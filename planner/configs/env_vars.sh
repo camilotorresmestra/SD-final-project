@@ -14,4 +14,4 @@ export BOT_INITIAL_YAW=90                           # [float][degress] robots ya
 export BOT_INITIAL_X=917                            # [int][pixels] x axis initial coordinate
 export BOT_INITIAL_Y=1047                           # [int][pixels] y axis initial coordinate
 
-export SOUND_DEVICE="sysdefault:CARD=PCH"           # [str] Sound device to use inside interface node
+export SOUND_DEVICE="sysdefault:CARD=Generic_1"         # [str] Sound device to use inside interface node
