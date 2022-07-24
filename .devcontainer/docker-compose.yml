@@ -8,13 +8,13 @@ services:
 
     user: "ada"
     working_dir: /home/ada
-    
+
     network_mode: host
 
     init: true
     privileged: true
 
-    environment: 
+    environment:
       - DISPLAY=$DISPLAY
       - QT_X11_NO_MITSHM=1
       - UDEV=1
@@ -34,11 +34,11 @@ services:
       # Enable creating/reading inside docker new devices
       - /dev:/dev
       # Uncomment the next four lines if you will use a ptrace-based debuggers like C++, Go, and Rust.
-        # Add devices to be share in container
-    devices: 
+      # Add devices to be share in container
+    devices:
       - /dev/input:/dev/input
       - /dev/snd:/dev/snd
-      
+
     cap_add:
       - SYS_PTRACE
 
@@ -50,4 +50,9 @@ services:
     stdin_open: true
     tty: true
 
-    command: "/bin/bash" 
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "echo 'source /opt/ros/galactic/setup.bash' >> ~/.bashrc"
+      ]
